@@ -65,4 +65,19 @@ router.post("/user/login", async (req, res) => {
   }
 });
 
+// 用户列表
+router.get('/user/userlist', async(req, res) => {
+  try {
+    let userInfo = await models.userModel.find({}, { username: 1, nickname: 1, email: 1, age: 1, sex: 1})
+    if(userInfo) {
+      resData.data = userInfo
+      resData.code = 200
+      res.json(resData)
+    }
+  } catch (error) {
+    resData.message = error
+    res.json(resData)
+  }
+})
+
 module.exports = router;
