@@ -44,6 +44,7 @@ router.post("/user/create", async (req, res) => {
 
 // 用户登录
 router.post("/user/login", async (req, res) => {
+  console.log('xxxxx')
   try {
     const { username, password } = req.body;
     let userInfo = await models.userModel.findOne({ username, password });
@@ -67,8 +68,33 @@ router.post("/user/login", async (req, res) => {
 
 // 用户列表
 router.get('/user/userlist', async(req, res) => {
+  const currentPage = req?.query?.currentPage || 1
+  const pageSize = req?.query?.pageSize || 10
+  const skip = (currentPage && currentPage - 1) * pageSize
+
+  let totalCount = 0
+  let pageData = []
+
   try {
-    let userInfo = await models.userModel.find({}, { username: 1, nickname: 1, email: 1, age: 1, sex: 1})
+    totalCount = await models.userModel.countDocuments()
+    console.log('totalCount', totalCount)
+
+
+    pageData = await models.userModel.find({}, { username: 1, nickname: 1, email: 1, age: 1, sex: 1}).skip(skip).limit(pageSize)
+    console.log('pageData', pageData)
+
+    resData.totalCount = totalCount
+    resData.pageData = pageData
+    res.json(resData)
+
+  } catch (error) {
+    resData.message = error
+    res.json(resData)
+  }
+  /* try {
+    let userInfo = await models.userModel.find({}, { username: 1, nickname: 1, email: 1, age: 1, sex: 1}, {skip, limit})
+    console.log('userInfo: ', userInfo)
+    // Promise.all([])
     if(userInfo) {
       resData.data = userInfo
       resData.code = 200
@@ -77,7 +103,7 @@ router.get('/user/userlist', async(req, res) => {
   } catch (error) {
     resData.message = error
     res.json(resData)
-  }
+  } */
 })
 
 module.exports = router;
