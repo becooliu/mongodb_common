@@ -34,9 +34,9 @@ const userSchema = mongoose.Schema(
       type: String,
       require: true
     },
-    age: {
-      type: Number,
-      default: 18
+    birthday: {
+      type: Date,
+      default: '2000-01-01'
     },
     sex: {
       type: String,

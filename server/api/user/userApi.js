@@ -10,14 +10,19 @@ router.post("/user/create", async (req, res) => {
   //let {username, pass} = ...req.body
   // console.log('req: ', req.body)
   try {
-    const { username, password } = req.body;
+    const { username, password, nickname, email, sex, birthday } = req.body;
     let user = await models.userModel.findOne({ username });
+    console.log('email', email)
     console.log("user: ", user);
 
     if (!user) {
       const newUser = new models.userModel({
         username,
         password,
+        nickname,
+        email,
+        sex,
+        birthday: new Date(birthday)
       });
       newUser
         .save()
@@ -80,7 +85,7 @@ router.get('/user/userlist', async(req, res) => {
     console.log('totalCount', totalCount)
 
 
-    pageData = await models.userModel.find({}, { username: 1, nickname: 1, email: 1, age: 1, sex: 1}).skip(skip).limit(pageSize)
+    pageData = await models.userModel.find({}, { username: 1, nickname: 1, email: 1, birthday: 1, sex: 1}).skip(skip).limit(pageSize)
     console.log('pageData', pageData)
 
     resData.totalCount = totalCount
