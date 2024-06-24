@@ -49,7 +49,6 @@ router.post("/user/create", async (req, res) => {
 
 // 用户登录
 router.post("/user/login", async (req, res) => {
-  console.log('xxxxx')
   try {
     const { username, password } = req.body;
     let userInfo = await models.userModel.findOne({ username, password });
@@ -57,13 +56,12 @@ router.post("/user/login", async (req, res) => {
     if (!userInfo) {
       resData.status = 230;
       resData.message = "用户不存在或密码错误，请确认。";
-      res.json(resData);
     } else {
       resData.status = 200;
       resData.message = "恭喜你，登录成功。";
       resData.username = username;
-      res.json(resData);
     }
+    res.json(resData);
   } catch (error) {
     console.log(error);
     resData.message = error;
@@ -109,6 +107,30 @@ router.get('/user/userlist', async(req, res) => {
     resData.message = error
     res.json(resData)
   } */
+})
+
+// 修改用户信息
+router.post('/user/update_userinfo', async(req, res) => {
+  try {
+    const {username, nickname, sex, birthday} = req.body
+    const updateResult = await models.userModel.findOneAndUpdate({username}, {$set: {nickname, sex, birthday}}, {upsert: true})
+    console.log('updateResult', updateResult)
+
+    if(!updateResult) {
+      // 数据更新失败
+      resData.status = 300
+      resData.message = '用户信息更新失败，请稍后再试'
+      
+    } else {
+      resData.userData = updateResult
+      resData.message = '更新用户成功'
+      resData.status = 200
+    }
+    res.json(resData)
+  } catch (error) {
+    resData.message == error
+    res.json(resData)
+  }
 })
 
 module.exports = router;
