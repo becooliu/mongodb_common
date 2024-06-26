@@ -3,10 +3,13 @@ const models = require("../../model/db");
 const express = require("express");
 const router = express.Router();
 
-const resData = {};
-
-// 注册用户
+/**
+ * 
+ * 注册用户
+ * 
+ */
 router.post("/user/create", async (req, res) => {
+  let resData = {};
   //let {username, pass} = ...req.body
   // console.log('req: ', req.body)
   try {
@@ -47,8 +50,13 @@ router.post("/user/create", async (req, res) => {
   }
 });
 
-// 用户登录
+/**
+ * 
+ * 用户登录
+ * 
+ */
 router.post("/user/login", async (req, res) => {
+  let resData = {};
   try {
     const { username, password } = req.body;
     let userInfo = await models.userModel.findOne({ username, password });
@@ -69,12 +77,23 @@ router.post("/user/login", async (req, res) => {
   }
 });
 
-// 用户列表
-router.get('/user/userlist', async(req, res) => {
-  const currentPage = req?.query?.currentPage || 1
-  const pageSize = req?.query?.pageSize || 10
-  const skip = (currentPage && currentPage - 1) * pageSize
+/**
+ * 
+ * 用户列表
+ * 
+ */
 
+// 分页数据
+let currentPage = 1
+let pageSize = 10
+let skip = (currentPage && currentPage - 1) * pageSize
+
+//控制用户列表需显示的字段
+const fieldShow = { username: 1, nickname: 1, email: 1, birthday: 1, sex: 1}
+
+// 获取用户列表数据
+const getUserData = async (skip, pageSize) => {
+  let resData = {};
   let totalCount = 0
   let pageData = []
 
@@ -82,35 +101,36 @@ router.get('/user/userlist', async(req, res) => {
     totalCount = await models.userModel.countDocuments()
     console.log('totalCount', totalCount)
 
-
-    pageData = await models.userModel.find({}, { username: 1, nickname: 1, email: 1, birthday: 1, sex: 1}).skip(skip).limit(pageSize)
-    console.log('pageData', pageData)
+    pageData = await models.userModel.find({}, fieldShow).skip(skip).limit(pageSize)
 
     resData.totalCount = totalCount
     resData.pageData = pageData
-    res.json(resData)
+    return resData
 
   } catch (error) {
     resData.message = error
-    res.json(resData)
+    return resData
   }
-  /* try {
-    let userInfo = await models.userModel.find({}, { username: 1, nickname: 1, email: 1, age: 1, sex: 1}, {skip, limit})
-    console.log('userInfo: ', userInfo)
-    // Promise.all([])
-    if(userInfo) {
-      resData.data = userInfo
-      resData.code = 200
-      res.json(resData)
-    }
-  } catch (error) {
-    resData.message = error
-    res.json(resData)
-  } */
+}
+
+router.get('/user/userlist', async(req, res) => {
+  let resData = {};
+  currentPage = req?.query?.currentPage || 1
+  pageSize = req?.query?.pageSize || 10
+  skip = (currentPage && currentPage - 1) * pageSize
+
+  resData = await getUserData(skip, pageSize)
+  res.json(resData)
+  
 })
 
-// 修改用户信息
+/**
+ * 
+ * 修改用户信息
+ * 
+ */
 router.post('/user/update_userinfo', async(req, res) => {
+  let resData = {};
   try {
     const {username, nickname, sex, birthday} = req.body
     const updateResult = await models.userModel.findOneAndUpdate({username}, {$set: {nickname, sex, birthday}}, {upsert: true})
@@ -131,6 +151,40 @@ router.post('/user/update_userinfo', async(req, res) => {
     resData.message == error
     res.json(resData)
   }
+})
+
+/**
+ * 
+ * 删除用户
+ * 
+ */
+router.post('/user/delete_user', async (req, res) => {
+  let resData = {};
+  try {
+    const {username, _id, currentPage, pageSize} = req.body
+    console.log('_id', _id)
+    
+    const user = await models.userModel.findByIdAndDelete({_id})
+      if(Object.keys(user)?.includes('_id')) {
+        resData.message = `删除用户${username}失败`
+        resData.status = 240
+      }else {
+        skip = (currentPage && currentPage - 1) * pageSize
+        
+        const pageData = await getUserData(skip, pageSize)
+
+        resData = pageData
+        resData.message = `删除用户${username}成功`
+        resData.status = 200
+      }
+      res.json(resData)
+
+  } catch (error) {
+    resData.message == error
+    res.json(resData)
+  }
+  
+
 })
 
 module.exports = router;
