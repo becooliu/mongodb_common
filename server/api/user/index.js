@@ -15,8 +15,6 @@ router.post("/user/create", async (req, res) => {
   try {
     const { username, password, nickname, email, sex, birthday } = req.body;
     let user = await models.userModel.findOne({ username });
-    console.log('email', email)
-    console.log("user: ", user);
 
     if (!user) {
       const newUser = new models.userModel({
@@ -59,15 +57,18 @@ router.post("/user/login", async (req, res) => {
   let resData = {};
   try {
     const { username, password } = req.body;
-    let userInfo = await models.userModel.findOne({ username, password });
-    console.log("user: ", userInfo);
-    if (!userInfo) {
+    let userData = await models.userModel.findOne({ username, password });
+    console.log("user: ", userData);
+    if (!userData) {
       resData.status = 230;
       resData.message = "用户不存在或密码错误，请确认。";
     } else {
       resData.status = 200;
       resData.message = "恭喜你，登录成功。";
+      resData._id = userData._id
       resData.username = username;
+      resData.isAdmin = userData.isAdmin
+
     }
     res.json(resData);
   } catch (error) {
@@ -99,7 +100,6 @@ const getUserData = async (skip, pageSize) => {
 
   try {
     totalCount = await models.userModel.countDocuments()
-    console.log('totalCount', totalCount)
 
     pageData = await models.userModel.find({}, fieldShow).skip(skip).limit(pageSize)
 
@@ -134,7 +134,6 @@ router.post('/user/update_userinfo', async(req, res) => {
   try {
     const {username, nickname, sex, birthday} = req.body
     const updateResult = await models.userModel.findOneAndUpdate({username}, {$set: {nickname, sex, birthday}}, {upsert: true})
-    console.log('updateResult', updateResult)
 
     if(!updateResult) {
       // 数据更新失败
@@ -162,7 +161,6 @@ router.post('/user/delete_user', async (req, res) => {
   let resData = {};
   try {
     const {username, _id, currentPage, pageSize} = req.body
-    console.log('_id', _id)
     
     const user = await models.userModel.findByIdAndDelete({_id})
       if(Object.keys(user)?.includes('_id')) {
