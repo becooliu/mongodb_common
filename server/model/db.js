@@ -17,36 +17,8 @@ const db = mongoose.connection;
 db.once("error", () => console.log("database connect error."));
 db.once("open", () => console.log("Mongo connect success ."));
 
-const userSchema = mongoose.Schema(
-  {
-    username: {
-      type: String,
-      required: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
-    nickname: {
-      type: String
-    },
-    email: {
-      type: String,
-      require: true
-    },
-    birthday: {
-      type: Date,
-      default: '2000-01-01'
-    },
-    sex: {
-      type: String,
-      default: "未知",
-    },
-  },
-  {
-    versionKey: false,
-  }
-);
+//引入数据库相应的 schema
+const userSchema = require('../schema/user')
 
 const Models = {
   userModel: mongoose.model("user", userSchema, "user"),
