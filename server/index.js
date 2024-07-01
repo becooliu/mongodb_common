@@ -2,7 +2,9 @@
 const express = require("express");
 const app = express();
 
-const api = require("./api/user/userApi");
+const api = require("./api/user/index");
+
+const models = require('./model/db')
 
 const bodyParser = require("body-parser");
 //解析 application/json
@@ -15,7 +17,7 @@ app.use(
 );
 
 const path = require("path");
-// 访问静态资源文件 这里是访问所有dist目录下的静态资源文件
+// 访问静态资源文件 这里是访问所有dist目录下的静态资源文件时，直接将__dirname + "../public/Uploads/images" 下的资源返回
 app.use(express.static(path.resolve(__dirname, "../public/Uploads/images")));
 
 //允许跨域访问 方法1：
@@ -42,7 +44,31 @@ app.use(
     }
   }); */
 
+  app.use((req, res, next) => {
+    
+    const userInfoCookieArr = req.headers.cookie.match(new RegExp("(^| )" + 'userInfo' + "=([^;]*)(;|$)"))
+    if(userInfoCookieArr?.length) {
+      try {
+        const userInfo = JSON.parse(unescape(userInfoCookieArr[2]))
+
+        //获取当前登录用户是否为管理员
+        models.login.findById(userInfo._id).then(user => {
+         req.userInfo.isAdmin = Boolean(user?.isAdmin)
+         next()
+        })
+      
+      } catch (error) {
+        next()
+      }
+    }else {
+      next()
+
+    }
+    
+  })
+
 app.use(api);
+
 
 const port = 8088;
 app.listen(port, () => {
