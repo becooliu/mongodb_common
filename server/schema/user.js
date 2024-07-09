@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+// const Roles = require('../model/Roles')
 
 module.exports = new mongoose.Schema({
     username: {
@@ -28,6 +29,10 @@ module.exports = new mongoose.Schema({
       type: Number,
       default: 0,
     },
+    role: {
+      type: mongoose.Schema.Types.ObjectId, // role 保存 roles collection 的 _id 字段
+      ref: 'Roles'
+    }
   },
   {
     versionKey: false,
