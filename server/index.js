@@ -1,10 +1,13 @@
-"use strict";
-const express = require("express");
-const app = express();
+"use strict"
+const express = require("express")
+const app = express()
 
-const api = require("./api/user/index");
+const userApi = require("./api/user/index")
+const rolesApi = require('./api/roles/index')
 
-const models = require('./model/db')
+const mongoose = require('mongoose')
+
+const User = require('./model/User')
 
 const bodyParser = require("body-parser");
 //解析 application/json
@@ -44,30 +47,42 @@ app.use(
     }
   }); */
 
-  app.use((req, res, next) => {
-    
-    const userInfoCookieArr = req.headers.cookie.match(new RegExp("(^| )" + 'userInfo' + "=([^;]*)(;|$)"))
-    if(userInfoCookieArr?.length) {
-      try {
-        const userInfo = JSON.parse(unescape(userInfoCookieArr[2]))
+/* app.use((req, res, next) => {
+  // console.log('req: ', req)
+  console.log('any request')
+  const userInfoCookieArr = req.headers?.cookie?.match(new RegExp("(^| )" + 'userInfo' + "=([^;]*)(;|$)"))
+  if(userInfoCookieArr?.length) {
+    try {
+      const userInfo = JSON.parse(unescape(userInfoCookieArr[2]))
 
-        //获取当前登录用户是否为管理员
-        models.login.findById(userInfo._id).then(user => {
-         req.userInfo.isAdmin = Boolean(user?.isAdmin)
-         next()
-        })
-      
-      } catch (error) {
+      //获取当前登录用户是否为管理员
+      User.findById(userInfo._id).then(user => {
+        console.log('是否为管理员：', user.isAdmin)
+        req.userInfo.isAdmin = Boolean(user?.isAdmin)
         next()
-      }
-    }else {
-      next()
-
-    }
+      })
     
-  })
+    } catch (error) {
+      next()
+    }
+  }else {
+    next()
 
-app.use(api);
+  }
+  
+}) */
+
+// 引用路由
+app.use(userApi);
+app.use(rolesApi)
+
+//连接数据库
+mongoose.connect("mongodb://127.0.0.1:27017/common");
+
+//为连接绑定事件
+const db = mongoose.connection;
+db.once("error", () => console.log("database connect error."));
+db.once("open", () => console.log("Mongo connect success ."));
 
 
 const port = 8088;

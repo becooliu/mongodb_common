@@ -1,4 +1,4 @@
-const models = require("../../model/db");
+const User = require('../../model/User')
 
 const express = require("express");
 const router = express.Router();
@@ -14,10 +14,10 @@ router.post("/user/create", async (req, res) => {
   // console.log('req: ', req.body)
   try {
     const { username, password, nickname, email, sex, birthday } = req.body;
-    let user = await models.userModel.findOne({ username });
+    let user = await User.findOne({ username });
 
     if (!user) {
-      const newUser = new models.userModel({
+      const newUser = new User({
         username,
         password,
         nickname,
@@ -57,7 +57,7 @@ router.post("/user/login", async (req, res) => {
   let resData = {};
   try {
     const { username, password } = req.body;
-    let userData = await models.userModel.findOne({ username, password });
+    let userData = await User.findOne({ username, password }).populate('role');
     console.log("user: ", userData);
     if (!userData) {
       resData.status = 230;
@@ -65,9 +65,10 @@ router.post("/user/login", async (req, res) => {
     } else {
       resData.status = 200;
       resData.message = "恭喜你，登录成功。";
-      resData._id = userData._id
+      resData.user = userData
+      /* resData._id = userData._id
       resData.username = username;
-      resData.isAdmin = userData.isAdmin
+      resData.isAdmin = userData.isAdmin */
 
     }
     res.json(resData);
@@ -99,9 +100,9 @@ const getUserData = async (skip, pageSize) => {
   let pageData = []
 
   try {
-    totalCount = await models.userModel.countDocuments()
+    totalCount = await User.countDocuments()
 
-    pageData = await models.userModel.find({}, fieldShow).skip(skip).limit(pageSize)
+    pageData = await User.find({}, fieldShow).skip(skip).limit(pageSize)
 
     resData.totalCount = totalCount
     resData.pageData = pageData
@@ -133,7 +134,7 @@ router.post('/user/update_userinfo', async(req, res) => {
   let resData = {};
   try {
     const {username, nickname, sex, birthday} = req.body
-    const updateResult = await models.userModel.findOneAndUpdate({username}, {$set: {nickname, sex, birthday}}, {upsert: true})
+    const updateResult = await User.findOneAndUpdate({username}, {$set: {nickname, sex, birthday}}, {upsert: true})
 
     if(!updateResult) {
       // 数据更新失败
@@ -162,7 +163,7 @@ router.post('/user/delete_user', async (req, res) => {
   try {
     const {username, _id, currentPage, pageSize} = req.body
     
-    const user = await models.userModel.findByIdAndDelete({_id})
+    const user = await User.findByIdAndDelete({_id})
       if(Object.keys(user)?.includes('_id')) {
         resData.message = `删除用户${username}失败`
         resData.status = 240
