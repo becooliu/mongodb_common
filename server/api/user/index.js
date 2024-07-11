@@ -3,15 +3,24 @@ const User = require('../../model/User')
 const express = require("express");
 const router = express.Router();
 
+let resData = {}
+router.use((req, res, next) => {
+  console.log('req.userInfo', req?.userInfo)
+  if(req?.userInfo && !req.userInfo?.isAdmin) {
+    res.json({message: '对不起，只有管理员才可以进入该页面。', code: 203})
+    return
+  }
+  resData.status = ''
+  resData.message = ''
+  next()
+})
+
 /**
  * 
  * 注册用户
  * 
  */
 router.post("/user/create", async (req, res) => {
-  let resData = {};
-  //let {username, pass} = ...req.body
-  // console.log('req: ', req.body)
   try {
     const { username, password, nickname, email, sex, birthday } = req.body;
     let user = await User.findOne({ username });
@@ -54,7 +63,6 @@ router.post("/user/create", async (req, res) => {
  * 
  */
 router.post("/user/login", async (req, res) => {
-  let resData = {};
   try {
     const { username, password } = req.body;
     let userData = await User.findOne({ username, password }).populate('role');
@@ -115,7 +123,6 @@ const getUserData = async (skip, pageSize) => {
 }
 
 router.get('/user/userlist', async(req, res) => {
-  let resData = {};
   currentPage = req?.query?.currentPage || 1
   pageSize = req?.query?.pageSize || 10
   skip = (currentPage && currentPage - 1) * pageSize
@@ -131,7 +138,6 @@ router.get('/user/userlist', async(req, res) => {
  * 
  */
 router.post('/user/update_userinfo', async(req, res) => {
-  let resData = {};
   try {
     const {username, nickname, sex, birthday} = req.body
     const updateResult = await User.findOneAndUpdate({username}, {$set: {nickname, sex, birthday}}, {upsert: true})
@@ -159,7 +165,6 @@ router.post('/user/update_userinfo', async(req, res) => {
  * 
  */
 router.post('/user/delete_user', async (req, res) => {
-  let resData = {};
   try {
     const {username, _id, currentPage, pageSize} = req.body
     
