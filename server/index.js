@@ -47,7 +47,8 @@ app.use(
     }
   }); */
 
-/* app.use((req, res, next) => {
+// 每次请求都将用户是否为管理员的信息传给后端，并在请求接口前进行判断
+app.use((req, res, next) => {
   // console.log('req: ', req)
   console.log('any request')
   const userInfoCookieArr = req.headers?.cookie?.match(new RegExp("(^| )" + 'userInfo' + "=([^;]*)(;|$)"))
@@ -58,7 +59,9 @@ app.use(
       //获取当前登录用户是否为管理员
       User.findById(userInfo._id).then(user => {
         console.log('是否为管理员：', user.isAdmin)
-        req.userInfo.isAdmin = Boolean(user?.isAdmin)
+        req.userInfo = {
+          isAdmin: Boolean(user?.isAdmin)
+        }
         next()
       })
     
@@ -70,7 +73,7 @@ app.use(
 
   }
   
-}) */
+})
 
 // 引用路由
 app.use(userApi);
