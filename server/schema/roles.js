@@ -5,7 +5,7 @@ module.exports = new mongoose.Schema({
       type: String,
       required: true,
     },
-    permission: {
+    permissions: {
       type: Array,
       required: true,
     }
