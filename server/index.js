@@ -4,10 +4,13 @@ const app = express()
 
 const userApi = require("./api/user/index")
 const rolesApi = require('./api/roles/index')
+const apiVisitApi = require('./api/statistics/index')
 
 const mongoose = require('mongoose')
 
 const User = require('./model/User')
+
+const apiVisit = require('./model/statistics/apiVisit')
 
 const bodyParser = require("body-parser");
 //解析 application/json
@@ -47,9 +50,24 @@ app.use(
     }
   }); */
 
-// 每次请求都将用户是否为管理员的信息传给后端，并在请求接口前进行判断
+
 app.use((req, res, next) => {
-  // console.log('req: ', req)
+  // 每次请求都将用户ip ,请求路径和时间保存，以备后续数据统计用
+  const apiVisitData = {
+    path: req.path,
+    ip: req.ip.match(/\d+\.\d+\.\d+\.\d+/) || '127.0.0.1',
+    visitTime: new Date().getTime()
+  }
+  try {
+    const apiRecord = new apiVisit(apiVisitData)
+    apiRecord.save().then((result) => {
+      console.log('api record', result)
+    })
+  } catch (error) {
+    console.log('api record save error: ', error)
+  }
+
+  // 每次请求都将用户是否为管理员的信息传给后端，并在请求接口前进行判断
   console.log('any request')
   const userInfoCookieArr = req.headers?.cookie?.match(new RegExp("(^| )" + 'userInfo' + "=([^;]*)(;|$)"))
   if(userInfoCookieArr?.length) {
@@ -76,8 +94,9 @@ app.use((req, res, next) => {
 })
 
 // 引用路由
-app.use(userApi);
+app.use(userApi)
 app.use(rolesApi)
+app.use(apiVisitApi)
 
 //连接数据库
 mongoose.connect("mongodb://127.0.0.1:27017/common");
