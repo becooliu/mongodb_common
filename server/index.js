@@ -5,6 +5,8 @@ const app = express()
 const userApi = require("./api/user/index")
 const rolesApi = require('./api/roles/index')
 const apiVisitApi = require('./api/statistics/index')
+const blogCatetory = require('./api/blogCategory/index')
+const blogApi = require('./api/blog/index')
 
 const mongoose = require('mongoose')
 
@@ -76,7 +78,7 @@ app.use((req, res, next) => {
 
       //获取当前登录用户是否为管理员
       User.findById(userInfo._id).then(user => {
-        console.log('是否为管理员：', user.isAdmin)
+        console.log('是否为管理员：', Boolean(user?.isAdmin))
         req.userInfo = {
           isAdmin: Boolean(user?.isAdmin)
         }
@@ -97,6 +99,8 @@ app.use((req, res, next) => {
 app.use(userApi)
 app.use(rolesApi)
 app.use(apiVisitApi)
+app.use(blogCatetory)
+app.use(blogApi)
 
 //连接数据库
 mongoose.connect("mongodb://127.0.0.1:27017/common");
