@@ -5,7 +5,7 @@ const router = express.Router();
 
 let resData = {}
 router.use((req, res, next) => {
-  console.log('req.userInfo', Boolean(req?.userInfo))
+  // console.log('req.userInfo', Boolean(req?.userInfo))
   if(req?.userInfo && !req.userInfo?.isAdmin) {
       res.json({message: '对不起，只有管理员才可以进入该页面。', status: 203})
       return
