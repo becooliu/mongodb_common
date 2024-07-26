@@ -3,6 +3,15 @@ const isEmail = (email) => {
   return p.test(email);
 };
 
+const areAllEmpty = () => {
+  for(let i = 0, len = arguments.length; i < len; i++) {
+    if(arguments[i] !== null && arguments[i] !== 'undefined' && arguments[i] !== '') {
+      return false
+    }
+  }
+  return true
+}
+
 const setCookie = (cookieName, cookieValue, expireDays) => {
   var exdate = new Date();
   exdate.setDate(exdate.getDate() + expireDays);
@@ -30,4 +39,4 @@ const deleteCookie = (name) => {
       name + "=" + cval + ";path=/;expires=" + exp.toGMTString();
 };
 
-module.exports = {isEmail, setCookie, getCookie, deleteCookie}
+module.exports = {isEmail, areAllEmpty, setCookie, getCookie, deleteCookie}
