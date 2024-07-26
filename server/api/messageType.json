@@ -1,38 +1,42 @@
 {
   "LOGIN_SUCCESS": {
-    "MESSAGE": "恭喜你，登录成功。",
-    "CODE": 200
+    "message": "恭喜你，登录成功。",
+    "status": 200
   },
   "LOGIN_FAILD": {
-    "MESSAGE": "用户不存在或密码错误，请确认。",
-    "CODE": 230
+    "message": "用户不存在或密码错误，请确认。",
+    "status": 230
   },
   "CREATE_USER_SUCCESS": {
-    "MESSAGE": "账号注册成功",
-    "CODE": 200
+    "message": "账号注册成功",
+    "status": 200
   },
   "CREATE_USER_FAILD": {
-    "MESSAGE": "账号已存在，请修改后重新注册。",
-    "CODE": 220
+    "message": "账号已存在，请修改后重新注册。",
+    "status": 220
   },
   "UPDATE_USER_INFO_FAILD": {
-    "MESSAGE": "用户信息更新失败，请稍后再试",
-    "CODE": 300
+    "message": "用户信息更新失败，请稍后再试",
+    "status": 300
   },
   "UPDATE_USER_INFO_SUCCESS": {
-    "MESSAGE": "用户信息更新成功。",
-    "CODE": 200
+    "message": "用户信息更新成功。",
+    "status": 200
   },
   "DELETE_USER_FAILD": {
-    "MESSAGE": "删除用户失败。",
-    "CODE": 240
+    "message": "删除用户失败。",
+    "status": 240
   },
   "DELETE_USER_SUCCESS": {
-    "MESSAGE": "删除用户成功。",
-    "CODE": 200
+    "message": "删除用户成功。",
+    "status": 200
   },
   "PAGE_NOT_ALLOWED": {
-    "MESSAGE": "对不起，只有管理员才可以进入该页面。",
-    "CODE": 203
+    "message": "对不起，只有管理员才可以进入该页面。",
+    "status": 203
+  },
+  "DATA_CAN_NOT_BE_EMPTY": {
+    "message": "对不起，数据不能为空，请检查",
+    "status": 204
   }
 }
