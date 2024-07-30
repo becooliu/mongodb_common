@@ -78,12 +78,27 @@ const getBlogData = async (skip, pageSize) => {
   }
 }
 router.get('/blog/list', async (req, res) => {
-  currentPage = req?.query?.currentPage || 1
+  currentPage = req.query?.currentPage || 1
   pageSize = req?.query?.pageSize || 10
   skip = (currentPage && currentPage - 1) * pageSize
 
   resData = await getBlogData(skip, pageSize)
   res.json(resData)
+})
+
+router.get('/blog/details/', async (req, res) => {
+  const blogId = req.query?._id
+  //console.log('blogId', blogId)
+  if (!blogId) return
+  try {
+    const blogData = await Blog.findOne({ _id: blogId }).populate('user')
+    resData.pageData = blogData
+    resData.status = 200
+    res.json(resData)
+  } catch (error) {
+    resData.message = error.toString()
+    res.json(resData)
+  }
 })
 
 module.exports = router
