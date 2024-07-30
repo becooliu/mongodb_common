@@ -12,7 +12,7 @@ router.use((req, res, next) => {
 })
 
 // 发表博客
-router.post("/blog/add", async (req, res) => {
+router.post('/blog/add', async (req, res) => {
   try {
     const { category, title, desc, keywords, content, user } = req.body
     // 检查发表的博客是否为空
@@ -29,15 +29,15 @@ router.post("/blog/add", async (req, res) => {
 
       blog
         .save()
-        .then((result) => {
-          resData.status = 200;
+        .then(result => {
+          resData.status = 200
           resData.message = `博客保存成功!`
           res.json(resData)
         })
-        .catch((err) => {
-          resData.message = err;
+        .catch(err => {
+          resData.message = err
           res.json(resData)
-        });
+        })
     } else {
       resData.status = 220
       resData.message = `博客数据不能为空，请检查后重新保存。`
@@ -56,12 +56,11 @@ let currentPage = 1
 let pageSize = 10
 let skip = (currentPage && currentPage - 1) * pageSize
 // 博客列表需显示的字段
-const blogField = { category: 1, title: 1, desc: 1, keywords: 1, views: 1, comments: 1, user: 1, createdAt: 1
-}
+const blogField = { category: 1, title: 1, desc: 1, keywords: 1, views: 1, comments: 1, user: 1, createdAt: 1 }
 
 // 获取用户列表数据
 const getBlogData = async (skip, pageSize) => {
-  let resData = {};
+  let resData = {}
   let totalCount = 0
   let pageData = []
 
@@ -73,7 +72,6 @@ const getBlogData = async (skip, pageSize) => {
     resData.totalCount = totalCount
     resData.pageData = pageData
     return resData
-
   } catch (error) {
     resData.message = error
     return resData

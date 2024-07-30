@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
 
-module.exports = new mongoose.Schema({
+module.exports = new mongoose.Schema(
+  {
     name: {
       type: String,
-      required: true,
+      required: true
     }
   },
   {
@@ -12,4 +13,5 @@ module.exports = new mongoose.Schema({
       createdAt: 'createdAt',
       updatedAt: 'updatedAt'
     }
-  })
+  }
+)

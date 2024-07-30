@@ -1,15 +1,17 @@
 const mongoose = require('mongoose')
 
-module.exports = new mongoose.Schema({
+module.exports = new mongoose.Schema(
+  {
     role: {
       type: String,
-      required: true,
+      required: true
     },
     permissions: {
       type: Array,
-      required: true,
+      required: true
     }
   },
   {
-    versionKey: false,
-  })
+    versionKey: false
+  }
+)

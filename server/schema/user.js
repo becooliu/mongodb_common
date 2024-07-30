@@ -1,14 +1,15 @@
 const mongoose = require('mongoose')
 // const Roles = require('../model/Roles')
 
-module.exports = new mongoose.Schema({
+module.exports = new mongoose.Schema(
+  {
     username: {
       type: String,
-      required: true,
+      required: true
     },
     password: {
       type: String,
-      required: true,
+      required: true
     },
     nickname: {
       type: String
@@ -23,11 +24,11 @@ module.exports = new mongoose.Schema({
     },
     sex: {
       type: String,
-      default: "未知",
+      default: '未知'
     },
     isAdmin: {
       type: Number,
-      default: 0,
+      default: 0
     },
     role: {
       type: mongoose.Schema.Types.ObjectId, // role 保存 roles collection 的 _id 字段
@@ -35,5 +36,6 @@ module.exports = new mongoose.Schema({
     }
   },
   {
-    versionKey: false,
-  })
+    versionKey: false
+  }
+)
