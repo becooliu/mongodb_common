@@ -91,12 +91,43 @@ router.get('/blog/details/', async (req, res) => {
   //console.log('blogId', blogId)
   if (!blogId) return
   try {
-    const blogData = await Blog.findOne({ _id: blogId }).populate('user')
-    resData.pageData = blogData
+    const populateObj = {
+      path: 'user category', // populate 字段
+      select: {
+        // populate 需要返回的字段
+        username: 1,
+        nickname: 1,
+        name: 1 // 博客分类名
+      },
+      options: {
+        limit: 3
+      }
+    }
+    const blogData = await Blog.findOne({ _id: blogId }).populate(populateObj)
+    resData = blogData
     resData.status = 200
     res.json(resData)
   } catch (error) {
-    resData.message = error.toString()
+    resData.message = error
+    res.json(resData)
+  }
+})
+
+// 猜你喜欢模块接口
+router.get('/blog/likes', async (req, res) => {
+  const { category, blogId } = req.query
+  if (!category) return
+  try {
+    const fieldShow = { _id: 1, title: 1 }
+    console.log('category', category)
+    // $ne：查询 _id 不等于blogId 的数据
+    const blogData = await Blog.find({ category, _id: { $ne: blogId } }, fieldShow).limit(2)
+    console.log('likes:', blogData)
+    resData = blogData
+    resData.status = 200
+    res.json(resData)
+  } catch (error) {
+    resData.message = error
     res.json(resData)
   }
 })
