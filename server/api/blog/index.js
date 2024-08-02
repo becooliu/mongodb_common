@@ -87,21 +87,27 @@ const getBlogData = async (skip, pageSize, populateObj) => {
     return resData
   }
 }
-router.get('/blog/list', async (req, res) => {
-  const populateObj = {
-    path: 'user category', // populate 字段
-    select: {
-      // populate 需要返回的字段
-      username: 1,
-      nickname: 1,
-      name: 1 // 博客分类名
-    }
+
+/**
+ * blog 列表
+*/
+// 列表需显示字段
+const blogListPopulateObj = {
+  path: 'user category', // populate 字段
+  select: {
+    // populate 需要返回的字段
+    username: 1,
+    nickname: 1,
+    name: 1 // 博客分类名
   }
+}
+
+router.get('/blog/list', async (req, res) => {
   currentPage = req.query?.currentPage || 1
   pageSize = req?.query?.pageSize || 10
   skip = (currentPage && currentPage - 1) * pageSize
 
-  resData = await getBlogData(skip, pageSize, populateObj)
+  resData = await getBlogData(skip, pageSize, blogListPopulateObj)
   res.json(resData)
 })
 
@@ -147,6 +153,30 @@ router.get('/blog/likes', async (req, res) => {
     res.json(resData)
   } catch (error) {
     resData.message = error
+    res.json(resData)
+  }
+})
+
+/**
+ *
+ * 删除博客
+ *
+ */
+router.post('/blog/delete_blog', async (req, res) => {
+  try {
+    const { _id, currentPage, pageSize } = req.body
+
+    await Blog.findByIdAndDelete({ _id })
+    skip = (currentPage && currentPage - 1) * pageSize
+
+    const pageData = await getBlogData(skip, pageSize, blogListPopulateObj)
+
+    resData = pageData
+    resData.message = `删除博客成功`
+    resData.status = 200
+    res.json(resData)
+  } catch (error) {
+    resData.message == error
     res.json(resData)
   }
 })
