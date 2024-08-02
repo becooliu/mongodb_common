@@ -56,10 +56,20 @@ let currentPage = 1
 let pageSize = 10
 let skip = (currentPage && currentPage - 1) * pageSize
 // 博客列表需显示的字段
-const blogField = { category: 1, title: 1, desc: 1, keywords: 1, views: 1, comments: 1, user: 1, createdAt: 1 }
+const blogField = {
+  category: 1,
+  title: 1,
+  desc: 1,
+  keywords: 1,
+  views: 1,
+  comments: 1,
+  user: 1,
+  createdAt: 1,
+  updatedAt: 1
+}
 
-// 获取用户列表数据
-const getBlogData = async (skip, pageSize) => {
+// 获取博客列表数据
+const getBlogData = async (skip, pageSize, populateObj) => {
   let resData = {}
   let totalCount = 0
   let pageData = []
@@ -67,7 +77,7 @@ const getBlogData = async (skip, pageSize) => {
   try {
     totalCount = await Blog.countDocuments()
 
-    pageData = await Blog.find({}, blogField).populate('user').skip(skip).limit(pageSize)
+    pageData = await Blog.find({}, blogField).populate(populateObj).skip(skip).limit(pageSize)
 
     resData.totalCount = totalCount
     resData.pageData = pageData
@@ -78,11 +88,20 @@ const getBlogData = async (skip, pageSize) => {
   }
 }
 router.get('/blog/list', async (req, res) => {
+  const populateObj = {
+    path: 'user category', // populate 字段
+    select: {
+      // populate 需要返回的字段
+      username: 1,
+      nickname: 1,
+      name: 1 // 博客分类名
+    }
+  }
   currentPage = req.query?.currentPage || 1
   pageSize = req?.query?.pageSize || 10
   skip = (currentPage && currentPage - 1) * pageSize
 
-  resData = await getBlogData(skip, pageSize)
+  resData = await getBlogData(skip, pageSize, populateObj)
   res.json(resData)
 })
 
