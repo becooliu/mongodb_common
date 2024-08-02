@@ -14,7 +14,7 @@ router.use((req, res, next) => {
 // 发表博客
 router.post('/blog/add', async (req, res) => {
   try {
-    const { category, title, desc, keywords, content, user } = req.body
+    const { category, title, desc, keywords, cover, content, user } = req.body
     // 检查发表的博客是否为空
     const emptyData = areAllEmpty(category, title, desc, content, user)
     if (!emptyData) {
@@ -23,6 +23,7 @@ router.post('/blog/add', async (req, res) => {
         title,
         desc,
         keywords,
+        cover,
         content,
         user
       })
@@ -63,6 +64,7 @@ const blogField = {
   keywords: 1,
   views: 1,
   comments: 1,
+  cover: 1,
   user: 1,
   createdAt: 1,
   updatedAt: 1
@@ -111,6 +113,9 @@ router.get('/blog/list', async (req, res) => {
   res.json(resData)
 })
 
+/***
+ * 博客详情
+*/
 router.get('/blog/details/', async (req, res) => {
   const blogId = req.query?._id
   //console.log('blogId', blogId)

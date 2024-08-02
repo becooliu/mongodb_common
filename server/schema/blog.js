@@ -19,6 +19,10 @@ module.exports = new mongoose.Schema(
     },
     title: String,
     desc: String,
+    cover: {
+      type: String,
+      match: /.*(jpg|JPG|jpeg|JPEG|gif|GIF|PNG|png|BMP|bmp).*/
+    },
     content: String,
     keywords: String,
     //评论
