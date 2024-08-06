@@ -186,4 +186,46 @@ router.post('/blog/delete_blog', async (req, res) => {
   }
 })
 
+/**
+ * 博客分类与数量统计
+ */
+router.get('/blog/count', async(req, res) => {
+  try {
+    const populateObj = {
+      path: 'category', // populate 字段
+      select: {
+        name: 1 // 博客分类名
+      }
+    }
+
+    const countData = await Blog.aggregate(
+      [
+        {
+          $lookup: {
+            from: "blogCategory",
+            localField: 'category',
+            foreignField: '_id',
+            as: 'name'
+          }
+        },
+        {
+          $group: {
+            _id: "$category",
+            count: {$sum: 1}
+          }
+        },
+        
+      ]
+    )
+
+    console.log('countData', countData)
+
+  } catch (error) {
+    res.json(error)
+  }
+  
+
+  
+})
+
 module.exports = router
