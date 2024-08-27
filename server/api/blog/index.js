@@ -163,6 +163,34 @@ router.get('/blog/likes', async (req, res) => {
 })
 
 /**
+ * 更新博客
+ */
+router.post('/blog/update_bloginfo', async (req, res) => {
+  try {
+    const { _id, title, cover, desc } = req.body
+    const updateResult = await Blog.findOneAndUpdate(
+      { _id },
+      { $set: { title, cover, desc } },
+      { upsert: true }
+    )
+
+    if (!updateResult) {
+      // 数据更新失败
+      resData.status = 300
+      resData.message = '博客信息更新失败，请稍后再试'
+    } else {
+      resData.userData = updateResult
+      resData.message = '更新博客成功'
+      resData.status = 200
+    }
+    res.json(resData)
+  } catch (error) {
+    resData.message == error
+    res.json(resData)
+  }
+})
+
+/**
  *
  * 删除博客
  *
