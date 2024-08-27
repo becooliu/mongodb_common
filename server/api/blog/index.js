@@ -188,7 +188,9 @@ router.post('/blog/delete_blog', async (req, res) => {
 
 /**
  * 博客分类与数量统计
+ * 方法返回的数据格式为数组对象
  */
+
 router.get('/blog/count', async(req, res) => {
   try {
     const populateObj = {
@@ -198,27 +200,26 @@ router.get('/blog/count', async(req, res) => {
       }
     }
 
-    const countData = await Blog.aggregate(
-      [
-        {
-          $lookup: {
-            from: "blogCategory",
-            localField: 'category',
-            foreignField: '_id',
-            as: 'name'
-          }
-        },
-        {
-          $group: {
-            _id: "$category",
-            count: {$sum: 1}
-          }
-        },
-        
-      ]
-    )
+    const countData = await Blog.aggregate([
+      {
+        $lookup: {
+          from: 'blogCategory',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'name'
+        }
+      },
+      {
+        $group: {
+          _id: '$category',
+          count: { $sum: 1 }
+        }
+      }
+    ])
 
-    console.log('countData', countData)
+    resData = countData
+    resData.status = 200
+    res.json(resData)
 
   } catch (error) {
     res.json(error)
