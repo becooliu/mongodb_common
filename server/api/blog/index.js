@@ -163,29 +163,53 @@ router.get('/blog/likes', async (req, res) => {
 })
 
 /**
- * 更新博客
+ * 根据 _id 查询要修改的blog 
  */
-router.post('/blog/update_bloginfo', async (req, res) => {
+router.get('/blog/get_by_id', async(req, res) => {
   try {
-    const { _id, title, cover, desc } = req.body
-    const updateResult = await Blog.findOneAndUpdate(
-      { _id },
-      { $set: { title, cover, desc } },
-      { upsert: true }
-    )
-
-    if (!updateResult) {
-      // 数据更新失败
-      resData.status = 300
-      resData.message = '博客信息更新失败，请稍后再试'
-    } else {
-      resData.userData = updateResult
-      resData.message = '更新博客成功'
-      resData.status = 200
+    const _id = req.query._id
+    console.log('query _id', _id)
+    if(!_id) {
+      resData.message = '_id 不能为空，请确认！'
+      resData.status = 220
+      res.json(resData)
     }
+
+    const populateObj = {
+      path: 'user category', // populate 字段
+      select: {
+        // populate 需要返回的字段
+        username: 1,
+        nickname: 1,
+        name: 1 // 博客分类名
+      }
+    }
+    const blogData = await Blog.findById({_id}).populate(populateObj)
+    console.log('blogData', blogData)
+    resData = blogData
+    resData.status = 200
     res.json(resData)
   } catch (error) {
     resData.message == error
+    res.json(resData)
+  }
+})
+
+/**
+ * 更新博客信息
+ */
+router.post('/blog/update_bloginfo', async (req, res) => {
+  try {
+    const { _id, title, desc, keywords, cover, content, user } = req.body
+
+    await Blog.findOneAndUpdate({ _id }, { $set: { title, desc, keywords, cover, content } }, { upsert: false })
+
+    resData.message = '更新博客成功'
+    resData.status = 200
+    res.json(resData)
+  } catch (error) {
+    console.log(error)
+    resData.message = error
     res.json(resData)
   }
 })
