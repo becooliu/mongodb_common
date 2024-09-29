@@ -40,22 +40,88 @@ router.post('/blog_category/add', async (req, res) => {
   }
 })
 
-// 获取分类数据
-router.get('/blog_category/get', async (req, res) => {
-  const fieldShow = { _id: 1, name: 1 }
+/**
+ * 分类列表
+*/
+// 分页数据
+let currentPage = 1
+let pageSize = 10
+let skip = (currentPage && currentPage - 1) * pageSize
+
+// 控制分类列表需显示的字段
+const fieldShow = { _id: 1, name: 1 }
+
+const getCategoryData = async (skip, pageSize) => {
+  let resData = {},
+    totalCount = 0,
+    categories = []
+
   try {
-    const categories = await blogCatetory.find({}, fieldShow)
-    if (!categories) {
+    totalCount = await blogCatetory.countDocuments()
+
+    categories = await blogCatetory.find({}, fieldShow).skip(skip).limit(pageSize)
+
+    if (!totalCount) {
       resData = MESSAGE.NO_CATEGORY_DATA
-      res.json(resData)
     } else {
-      console.log('分类', categories)
+      resData.totalCount = totalCount
       resData.categories = categories
       resData.status = 200
-      res.json(resData)
     }
+    return resData
   } catch (error) {
     resData.message = error
+    return resData
+  }
+}
+// 获取分类数据
+router.get('/blog_category/get', async (req, res) => {
+  currentPage = req?.query?.currentPage || 1
+  pageSize = req?.query?.pageSize || 10
+  skip = (currentPage && currentPage - 1) * pageSize
+
+  resData = await getCategoryData(skip, pageSize)
+  res.json(resData)
+})
+
+/**
+ * 修改分类名
+ */
+router.post('/blog_category/update', async (req, res) => {
+  let { _id, name } = req.body
+  try {
+    await blogCatetory.findByIdAndUpdate({ _id }, { $set: { name } }, { upsert: false })
+    resData = MESSAGE.CATEGORY_UPDATE_SUCCESS
+    res.json(resData)
+  } catch (error) {
+    resData.message = error
+    res.json(resData)
+  }
+})
+
+/**
+ * 删除分类
+ */
+router.post('/blog_category/delete', async (req, res) => {
+  try {
+    const { _id, name, currentPage, pageSize } = req.body
+
+    const category = await blogCatetory.findByIdAndDelete({ _id })
+    if (Object.keys(category)?.includes('_id')) {
+      resData.message = `删除分类${name}失败`
+      resData.status = 240
+    } else {
+      skip = (currentPage && currentPage - 1) * pageSize
+
+      const categories = await getCategoryData(skip, pageSize)
+
+      resData = categories
+      resData.message = `删除分类${name}成功`
+      resData.status = 200
+    }
+    res.json(resData)
+  } catch (error) {
+    resData.message == error
     res.json(resData)
   }
 })
