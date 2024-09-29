@@ -4,6 +4,8 @@ const router = express()
 const Blog = require('../../model/Blog.js')
 const { areAllEmpty } = require('../../../utils/index.js')
 
+const MESSAGE = require('../messageType.json')
+
 let resData = {}
 router.use((req, res, next) => {
   resData.status = ''
@@ -31,8 +33,7 @@ router.post('/blog/add', async (req, res) => {
       blog
         .save()
         .then(result => {
-          resData.status = 200
-          resData.message = `博客保存成功!`
+          resData = MESSAGE.BLOG_ADDED_SUCCESS
           res.json(resData)
         })
         .catch(err => {
@@ -40,8 +41,7 @@ router.post('/blog/add', async (req, res) => {
           res.json(resData)
         })
     } else {
-      resData.status = 220
-      resData.message = `博客数据不能为空，请检查后重新保存。`
+      resData = MESSAGE.DATA_CAN_NOT_BE_EMPTY
       res.json(resData)
     }
   } catch (error) {
@@ -92,7 +92,7 @@ const getBlogData = async (skip, pageSize, populateObj) => {
 
 /**
  * blog 列表
-*/
+ */
 // 列表需显示字段
 const blogListPopulateObj = {
   path: 'user category', // populate 字段
@@ -115,7 +115,7 @@ router.get('/blog/list', async (req, res) => {
 
 /***
  * 博客详情
-*/
+ */
 router.get('/blog/details/', async (req, res) => {
   const blogId = req.query?._id
   //console.log('blogId', blogId)
@@ -163,15 +163,14 @@ router.get('/blog/likes', async (req, res) => {
 })
 
 /**
- * 根据 _id 查询要修改的blog 
+ * 根据 _id 查询要修改的blog
  */
-router.get('/blog/get_by_id', async(req, res) => {
+router.get('/blog/get_by_id', async (req, res) => {
   try {
     const _id = req.query._id
     console.log('query _id', _id)
-    if(!_id) {
-      resData.message = '_id 不能为空，请确认！'
-      resData.status = 220
+    if (!_id) {
+      resData = MESSAGE.ID_CAN_NOT_BE_EMPTY
       res.json(resData)
     }
 
@@ -184,7 +183,7 @@ router.get('/blog/get_by_id', async(req, res) => {
         name: 1 // 博客分类名
       }
     }
-    const blogData = await Blog.findById({_id}).populate(populateObj)
+    const blogData = await Blog.findById({ _id }).populate(populateObj)
     console.log('blogData', blogData)
     resData = blogData
     resData.status = 200
@@ -204,8 +203,7 @@ router.post('/blog/update_bloginfo', async (req, res) => {
 
     await Blog.findOneAndUpdate({ _id }, { $set: { title, desc, keywords, cover, content } }, { upsert: false })
 
-    resData.message = '更新博客成功'
-    resData.status = 200
+    resData = MESSAGE.BLOG_UPDATED_SUCCESS
     res.json(resData)
   } catch (error) {
     console.log(error)
@@ -229,7 +227,7 @@ router.post('/blog/delete_blog', async (req, res) => {
     const pageData = await getBlogData(skip, pageSize, blogListPopulateObj)
 
     resData = pageData
-    resData.message = `删除博客成功`
+    resData.message = '删除博客成功'
     resData.status = 200
     res.json(resData)
   } catch (error) {

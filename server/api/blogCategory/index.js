@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express()
 
-const messageType = require('../messageType.json')
+const MESSAGE = require('../messageType.json')
 
 const blogCatetory = require('../../model/BlogCatetory.js')
 
@@ -15,8 +15,7 @@ router.use((req, res, next) => {
 router.post('/blog_category/add', async (req, res) => {
   let categoryName = req.body?.categoryName
   if (!categoryName) {
-    resData.status = messageType.DATA_CAN_NOT_BE_EMPTY.status
-    resData.message = messageType.DATA_CAN_NOT_BE_EMPTY.message
+    resData = MESSAGE.DATA_CAN_NOT_BE_EMPTY
     res.json(resData)
   }
   try {
@@ -47,8 +46,7 @@ router.get('/blog_category/get', async (req, res) => {
   try {
     const categories = await blogCatetory.find({}, fieldShow)
     if (!categories) {
-      resData.message = '目前没有分类信息'
-      resData.status = 201
+      resData = MESSAGE.NO_CATEGORY_DATA
       res.json(resData)
     } else {
       console.log('分类', categories)

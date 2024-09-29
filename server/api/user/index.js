@@ -3,15 +3,16 @@ const User = require('../../model/User')
 const express = require('express')
 const router = express.Router()
 
+const MESSAGE = require('../messageType.json')
+
 let resData = {}
 router.use((req, res, next) => {
   // console.log('req.userInfo', req?.userInfo)
   if (req?.userInfo && !req.userInfo?.isAdmin) {
-    res.json({ message: '对不起，只有管理员才可以进入该页面。', code: 203 })
+    res.json(MESSAGE.PAGE_NOT_ALLOWED)
     return
   }
-  resData.status = ''
-  resData.message = ''
+  resData = null
   next()
 })
 
@@ -68,11 +69,9 @@ router.post('/user/login', async (req, res) => {
     let userData = await User.findOne({ username, password }).populate('role')
     console.log('user: ', userData)
     if (!userData) {
-      resData.status = 230
-      resData.message = '用户不存在或密码错误，请确认。'
+      resData = MESSAGE.LOGIN_FAILD
     } else {
-      resData.status = 200
-      resData.message = '恭喜你，登录成功。'
+      resData = MESSAGE.LOGIN_SUCCESS
       resData.user = userData
       /* resData._id = userData._id
       resData.username = username;
@@ -145,12 +144,9 @@ router.post('/user/update_userinfo', async (req, res) => {
 
     if (!updateResult) {
       // 数据更新失败
-      resData.status = 300
-      resData.message = '用户信息更新失败，请稍后再试'
+      resData = MESSAGE.UPDATE_USER_INFO_FAILD
     } else {
-      resData.userData = updateResult
-      resData.message = '更新用户成功'
-      resData.status = 200
+      resData = MESSAGE.UPDATE_USER_INFO_SUCCESS
     }
     res.json(resData)
   } catch (error) {

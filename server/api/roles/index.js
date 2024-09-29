@@ -3,11 +3,13 @@ const Roles = require('../../model/Roles')
 const express = require('express')
 const router = express.Router()
 
+const MESSAGE = require('../messageType.json')
+
 let resData = {}
 router.use((req, res, next) => {
   // console.log('req.userInfo', Boolean(req?.userInfo))
   if (req?.userInfo && !req.userInfo?.isAdmin) {
-    res.json({ message: '对不起，只有管理员才可以进入该页面。', status: 203 })
+    res.json(MESSAGE.PAGE_NOT_ALLOWED)
     return
   }
   resData.status = ''
@@ -27,8 +29,7 @@ router.post('/roles/create', async (req, res) => {
       })
 
       newRole.save().then(result => {
-        resData.status = 200
-        resData.message = '新增角色成功'
+        resData = MESSAGE.ROLE_ADDED_SUCCESS
         resData.role = role
         res.json(resData)
       })
@@ -43,11 +44,9 @@ router.post('/roles/create', async (req, res) => {
         )
         if (!updateRoleAndPermission) {
           // 数据更新失败
-          resData.status = 300
-          resData.message = '角色更新失败，请稍后再试'
+          resData = MESSAGE.ROLE_UPDATE_FAILD
         } else {
-          resData.status = 200
-          resData.message = '角色更新成功'
+          resData = MESSAGE.ROLE_UPDATE_SUCCESS
         }
         res.json(resData)
       } else {

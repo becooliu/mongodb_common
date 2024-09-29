@@ -38,5 +38,37 @@
   "DATA_CAN_NOT_BE_EMPTY": {
     "message": "对不起，数据不能为空，请检查",
     "status": 204
+  },
+  "BLOG_ADDED_SUCCESS": {
+    "message": "博客保存成功!",
+    "status": 200
+  },
+  "ID_CAN_NOT_BE_EMPTY": {
+    "message": "_id 不能为空，请确认！",
+    "status": 220
+  },
+  "BLOG_UPDATED_SUCCESS": {
+    "message": "更新博客成功",
+    "status": 200
+  },
+  "BLOG_DELETE_SUCCESS": {
+    "message": "删除博客成功",
+    "status": 200
+  },
+  "NO_CATEGORY_DATA": {
+    "message": "目前没有分类信息",
+    "status": 201
+  },
+  "ROLE_ADDED_SUCCESS": {
+    "message": "新增角色成功",
+    "status": 200
+  },
+  "ROLE_UPDATE_SUCCESS": {
+    "message": "更新角色成功",
+    "status": 200
+  },
+  "ROLE_UPDATE_FAILD": {
+    "message": "角色更新失败，请稍后再试",
+    "status": 300
   }
 }
