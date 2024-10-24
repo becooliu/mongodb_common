@@ -59,6 +59,10 @@
     "message": "目前没有分类信息",
     "status": 201
   },
+  "NO_ROLES_DATA": {
+    "message": "目前没有角色信息",
+    "status": 201
+  },
   "ROLE_ADDED_SUCCESS": {
     "message": "新增角色成功",
     "status": 200
