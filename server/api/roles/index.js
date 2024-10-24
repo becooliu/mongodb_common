@@ -17,6 +17,52 @@ router.use((req, res, next) => {
   next()
 })
 
+// 获取角色列表
+// 分页数据
+let currentPage = 1
+let pageSize = 10
+let skip = (currentPage && currentPage - 1) * pageSize
+
+const getRoleData = async (skip, pageSize) => {
+  let resData = {}
+  let totalCount = 0
+  let pageData = []
+
+  try{
+    totalCount = await Roles.countDocuments()
+    pageData = await Roles.find({}).skip(skip).limit(pageSize)
+    if(!pageData) {
+      resData = MESSAGE.NO_ROLES_DATA
+    }else {
+      resData.pageData = pageData
+      resData.totalCount = totalCount
+      console.log('AAAAAA', resData)
+      resData.status = 200
+    }
+    return resData
+  }catch(error){
+    resData.message = error
+    return resData
+  }
+}
+/**
+ * 获取初始role 数据
+ * 用于填充初始表单
+*/
+router.get('/roles/getAll', async (req, res) => {
+  currentPage = req.query?.currentPage || 1
+  pageSize = req?.query?.pageSize || 10
+  skip = (currentPage && currentPage - 1) * pageSize
+
+  
+  resData = await getRoleData(skip, pageSize)
+  console.log('111111111', resData)
+  res.json(resData)
+})
+
+/***
+ * 创建角色
+ */
 router.post('/roles/create', async (req, res) => {
   try {
     const { role, permissions } = req.body
