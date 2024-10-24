@@ -10,6 +10,9 @@ router.use((req, res, next) => {
   next()
 })
 
+/**
+ * api 访问次数统计
+ */
 router.get('/getApiVisited', async (req, res) => {
   try {
     let data = await apiVisited.countDocuments()
