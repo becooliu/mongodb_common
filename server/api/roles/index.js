@@ -28,19 +28,18 @@ const getRoleData = async (skip, pageSize) => {
   let totalCount = 0
   let pageData = []
 
-  try{
+  try {
     totalCount = await Roles.countDocuments()
     pageData = await Roles.find({}).skip(skip).limit(pageSize)
-    if(!pageData) {
+    if (!pageData) {
       resData = MESSAGE.NO_ROLES_DATA
-    }else {
+    } else {
       resData.pageData = pageData
       resData.totalCount = totalCount
-      console.log('AAAAAA', resData)
       resData.status = 200
     }
     return resData
-  }catch(error){
+  } catch (error) {
     resData.message = error
     return resData
   }
@@ -48,15 +47,13 @@ const getRoleData = async (skip, pageSize) => {
 /**
  * 获取初始role 数据
  * 用于填充初始表单
-*/
+ */
 router.get('/roles/getAll', async (req, res) => {
   currentPage = req.query?.currentPage || 1
   pageSize = req?.query?.pageSize || 10
   skip = (currentPage && currentPage - 1) * pageSize
 
-  
   resData = await getRoleData(skip, pageSize)
-  console.log('111111111', resData)
   res.json(resData)
 })
 
