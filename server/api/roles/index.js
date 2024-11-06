@@ -131,4 +131,28 @@ router.post('/roles/create', async (req, res) => {
   }
 })
 
+/**
+ * 修改角色
+ */
+router.post('/user/update_role', async (req, res) => {
+  try {
+    const { role, _id } = req.body
+    let roleData = await Roles.findOne({ _id })
+    if (!roleData) {
+      resData.message = `此角色不存在，请确认。`
+      resData.status = 220
+      res.json(resData)
+    }
+
+    // 更新数据
+    await Roles.findOneAndUpdate({ _id }, { $set: { role } }, { upsert: false })
+
+    resData.message = `角色更新成功`
+    resData.status = 200
+    res.json(resData)
+  } catch (error) {
+    res.json(error)
+  }
+})
+
 module.exports = router
