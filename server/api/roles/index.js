@@ -60,6 +60,31 @@ router.get('/roles/getAll', async (req, res) => {
 /***
  * 创建角色
  */
+router.post('/roles/add', async (req, res) => {
+  try {
+    const { role } = req.body
+    let roleData = await Roles.findOne({ role })
+    if (!roleData) {
+      const newRole = new Roles({
+        role
+      })
+      newRole.save().then(result => {
+        resData.roleData = result
+        resData.message = '新增角色成功'
+        resData.status = 200
+        res.json(resData)
+      })
+    } else {
+      resData = MESSAGE.ROLE_EXIST
+      res.json(resData)
+    }
+  } catch (error) {
+    console.log('error')
+    resData.message = error
+    res.json(resData)
+  }
+})
+
 router.post('/roles/create', async (req, res) => {
   try {
     const { role, permissions } = req.body

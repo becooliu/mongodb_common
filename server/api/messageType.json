@@ -67,6 +67,10 @@
     "message": "新增角色成功",
     "status": 200
   },
+  "ROLE_EXIST": {
+    "message": "角色已存在，新增角色操失败",
+    "status": 210
+  },
   "ROLE_UPDATE_SUCCESS": {
     "message": "更新角色成功",
     "status": 200
