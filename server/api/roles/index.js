@@ -155,4 +155,32 @@ router.post('/user/update_role', async (req, res) => {
   }
 })
 
+/**
+ *
+ * 删除角色
+ *
+ */
+router.post('/user/delete_role', async (req, res) => {
+  try {
+    const { role, _id, currentPage, pagesize } = req.body
+
+    const roleName = await Roles.findByIdAndDelete({ _id })
+    if (roleName && Object.keys(roleName)?.includes('_id')) {
+      resData.message = `删除角色 ${role} 失败`
+      resData.status = 240
+    } else {
+      skip = (currentPage && currentPage - 1) * pagesize
+      const pageData = await getRoleData(skip, pagesize)
+
+      resData = pageData
+      resData.message = `删除角色 ${role} 成功`
+      resData.status = 200
+    }
+    res.json(resData)
+  } catch (error) {
+    resData.message == error
+    res.json(resData)
+  }
+})
+
 module.exports = router
