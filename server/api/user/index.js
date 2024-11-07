@@ -162,16 +162,16 @@ router.post('/user/update_userinfo', async (req, res) => {
  */
 router.post('/user/delete_user', async (req, res) => {
   try {
-    const { username, _id, currentPage, pageSize } = req.body
+    const { username, _id, currentPage, pagesize } = req.body
 
     const user = await User.findByIdAndDelete({ _id })
     if (Object.keys(user)?.includes('_id')) {
       resData.message = `删除用户${username}失败`
       resData.status = 240
     } else {
-      skip = (currentPage && currentPage - 1) * pageSize
+      skip = (currentPage && currentPage - 1) * pagesize
 
-      const pageData = await getUserData(skip, pageSize)
+      const pageData = await getUserData(skip, pagesize)
 
       resData = pageData
       resData.message = `删除用户${username}成功`
