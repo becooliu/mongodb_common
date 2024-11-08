@@ -23,6 +23,12 @@ let currentPage = 1
 let pageSize = 10
 let skip = (currentPage && currentPage - 1) * pageSize
 
+/**
+ * 
+ * @param {number} skip 
+ * @param {number} pageSize 
+ * @returns {object}
+ */
 const getRoleData = async (skip, pageSize) => {
   let resData = {}
   let totalCount = 0
@@ -133,6 +139,7 @@ router.post('/roles/create', async (req, res) => {
 
 /**
  * 修改角色
+ * 根据 _id 修改角色名称
  */
 router.post('/user/update_role', async (req, res) => {
   try {
@@ -177,6 +184,29 @@ router.post('/user/delete_role', async (req, res) => {
       resData.status = 200
     }
     res.json(resData)
+  } catch (error) {
+    resData.message == error
+    res.json(resData)
+  }
+})
+
+/**
+ * 权限管理
+ */
+router.post('/permission/update', async (req, res) => {
+  try {
+    const {_id, role, permissions} = req.body
+    const permissionData = await Roles.findByIdAndUpdate({_id}, { permissions },
+      { new: true })
+    if(permissionData) {
+      resData.message = '权限更新成功。'
+      resData.status = 200
+    }else {
+      resData.message = '权限更新失败。'
+      resData.status = 210
+    }
+    res.json(resData)
+
   } catch (error) {
     resData.message == error
     res.json(resData)
