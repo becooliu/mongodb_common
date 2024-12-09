@@ -6,7 +6,7 @@ const router = express.Router()
 const MESSAGE = require('../messageType.json')
 
 let resData = {}
-router.use((req, res, next) => {
+/* router.use((req, res, next) => {
   // console.log('req.userInfo', req?.userInfo)
   if (req?.userInfo && !req.userInfo?.isAdmin) {
     res.json(MESSAGE.PAGE_NOT_ALLOWED)
@@ -14,7 +14,7 @@ router.use((req, res, next) => {
   }
   resData = null
   next()
-})
+}) */
 
 /**
  *
