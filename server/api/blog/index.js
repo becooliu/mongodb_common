@@ -143,6 +143,24 @@ router.get('/blog/details/', async (req, res) => {
   }
 })
 
+/**
+ * 更新博客阅读量
+ */
+router.post('/blog/views_increase', async (req, res) => {
+  const { views, _id } = req.body
+  try {
+    console.log('get')
+    await Blog.findOneAndUpdate({ _id }, { $set: { views } }, { upsert: true })
+
+    resData.message = '阅读量更新成功'
+    resData.status = 200
+    res.json(resData)
+  } catch (error) {
+    resData.message = error
+    res.json(resData)
+  }
+})
+
 // 猜你喜欢模块接口
 router.get('/blog/likes', async (req, res) => {
   const { category, blogId } = req.query
