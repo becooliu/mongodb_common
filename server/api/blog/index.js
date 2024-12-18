@@ -8,6 +8,7 @@ const MESSAGE = require('../messageType.json')
 
 let resData = {}
 router.use((req, res, next) => {
+  console.log('reset resData')
   resData.status = ''
   resData.message = ''
   next()
@@ -153,6 +154,27 @@ router.post('/blog/views_increase', async (req, res) => {
     await Blog.findOneAndUpdate({ _id }, { $set: { views } }, { upsert: true })
 
     resData.message = '阅读量更新成功'
+    resData.status = 200
+    res.json(resData)
+  } catch (error) {
+    resData.message = error
+    res.json(resData)
+  }
+})
+
+/**
+ * 发表评论
+ */
+router.post('/blog/add_comment', async (req, res) => {
+  const { _id, replyId, randomId, comment, username } = req.body
+  try {
+    await Blog.findByIdAndUpdate({ _id }, { $push: { comments: { replyId, randomId, comment, username } } })
+
+    //根据Id 查询此blog下的所有评论
+    const commentsArr = await Blog.findById({ _id }).select('comments')
+    resData.data = commentsArr
+
+    resData.message = '评论发表成功'
     resData.status = 200
     res.json(resData)
   } catch (error) {
