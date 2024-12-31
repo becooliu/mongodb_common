@@ -9,6 +9,7 @@ const MESSAGE = require('../messageType.json')
 let resData = {}
 router.use((req, res, next) => {
   console.log('reset resData')
+  resData.data = null
   resData.status = ''
   resData.message = ''
   next()
@@ -160,6 +161,7 @@ router.post('/blog/views_increase', async (req, res) => {
     resData.message = error
     res.json(resData)
   }
+  resData = {}
 })
 
 /**
@@ -171,16 +173,19 @@ router.post('/blog/add_comment', async (req, res) => {
     await Blog.findByIdAndUpdate({ _id }, { $push: { comments: { replyId, randomId, comment, username } } })
 
     //根据Id 查询此blog下的所有评论
-    const commentsArr = await Blog.findById({ _id }).select('comments')
-    resData.data = commentsArr
-
+    const commentsObj = await Blog.findById({ _id }).select('comments')
     resData.message = '评论发表成功'
     resData.status = 200
+    const data = commentsObj.comments
+    resData.data = data
+
+    console.log('resData', resData)
     res.json(resData)
   } catch (error) {
     resData.message = error
     res.json(resData)
   }
+  resData = {}
 })
 
 // 猜你喜欢模块接口
@@ -200,6 +205,7 @@ router.get('/blog/likes', async (req, res) => {
     resData.message = error
     res.json(resData)
   }
+  resData = {}
 })
 
 /**
