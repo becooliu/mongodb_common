@@ -7,6 +7,7 @@ const rolesApi = require('./api/roles/index')
 const apiVisitApi = require('./api/statistics/index')
 const blogCatetory = require('./api/blogCategory/index')
 const blogApi = require('./api/blog/index')
+const commentsApi = require('./api/comments/index')
 
 const mongoose = require('mongoose')
 
@@ -97,6 +98,7 @@ app.use(rolesApi)
 app.use(apiVisitApi)
 app.use(blogCatetory)
 app.use(blogApi)
+app.use(commentsApi)
 
 //连接数据库
 mongoose.connect('mongodb://127.0.0.1:27017/common')
