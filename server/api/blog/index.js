@@ -170,16 +170,27 @@ router.post('/blog/views_increase', async (req, res) => {
 router.post('/blog/add_comment', async (req, res) => {
   const { _id, replyId, randomId, comment, username } = req.body
   try {
-    await Blog.findByIdAndUpdate({ _id }, { $push: { comments: { replyId, randomId, comment, username } } })
+    if (!replyId) {
+      await Blog.findByIdAndUpdate({ _id }, { $push: { comments: { replyId: '', randomId, comment, username } } })
+    } else {
+      await Blog.updateOne({ _id }, { $push: { replies: { randomId, comment, username } } })
+      console.log('replyArr', replyArr)
+    }
 
     //根据Id 查询此blog下的所有评论
-    const commentsObj = await Blog.findById({ _id }).select('comments')
+    const commentsObj = await Blog.findById({ _id })
+      .sort({ randomId: 1 })
+      .forEach(reply => {
+        reply.replies.sort((a, b) => {
+          return a.randomId - b.randomId
+        })
+      })
     resData.message = '评论发表成功'
     resData.status = 200
+    console.log('commentsObj', commentsObj)
     const data = commentsObj.comments
     resData.data = data
 
-    console.log('resData', resData)
     res.json(resData)
   } catch (error) {
     resData.message = error
