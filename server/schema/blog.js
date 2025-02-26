@@ -24,12 +24,7 @@ module.exports = new mongoose.Schema(
       match: /.*(jpg|JPG|jpeg|JPEG|gif|GIF|PNG|png|BMP|bmp).*/
     },
     content: String,
-    keywords: String,
-    //评论
-    comments: {
-      type: Array,
-      default: []
-    }
+    keywords: String
   },
   {
     timestamps: {
