@@ -6,17 +6,9 @@ const { areAllEmpty } = require('../../../utils/index.js')
 
 const MESSAGE = require('../messageType.json')
 
-let resData = {}
-router.use((req, res, next) => {
-  console.log('reset resData')
-  resData.data = null
-  resData.status = ''
-  resData.message = ''
-  next()
-})
-
 // 发表博客
 router.post('/blog/add', async (req, res) => {
+  let resData = {}
   try {
     const { category, title, desc, keywords, cover, content, user } = req.body
     // 检查发表的博客是否为空
@@ -107,6 +99,7 @@ const blogListPopulateObj = {
 }
 
 router.get('/blog/list', async (req, res) => {
+  let resData = {}
   currentPage = req.query?.currentPage || 1
   pageSize = req?.query?.pageSize || 10
   skip = (currentPage && currentPage - 1) * pageSize
@@ -119,6 +112,7 @@ router.get('/blog/list', async (req, res) => {
  * 博客详情
  */
 router.get('/blog/details/', async (req, res) => {
+  let resData = {}
   const blogId = req.query?._id
   //console.log('blogId', blogId)
   if (!blogId) return
@@ -149,6 +143,7 @@ router.get('/blog/details/', async (req, res) => {
  * 更新博客阅读量
  */
 router.post('/blog/views_increase', async (req, res) => {
+  let resData = {}
   const { views, _id } = req.body
   try {
     console.log('get')
@@ -168,6 +163,7 @@ router.post('/blog/views_increase', async (req, res) => {
  * 发表评论
  */
 router.post('/blog/add_comment', async (req, res) => {
+  let resData = {}
   const { _id, replyId, randomId, comment, username } = req.body
   try {
     if (!replyId) {
@@ -201,6 +197,7 @@ router.post('/blog/add_comment', async (req, res) => {
 
 // 猜你喜欢模块接口
 router.get('/blog/likes', async (req, res) => {
+  let resData = {}
   const { category, blogId } = req.query
   if (!category) return
   try {
@@ -223,6 +220,7 @@ router.get('/blog/likes', async (req, res) => {
  * 根据 _id 查询要修改的blog
  */
 router.get('/blog/get_by_id', async (req, res) => {
+  let resData = {}
   try {
     const _id = req.query._id
     console.log('query _id', _id)
@@ -255,10 +253,12 @@ router.get('/blog/get_by_id', async (req, res) => {
  * 更新博客信息
  */
 router.post('/blog/update_bloginfo', async (req, res) => {
+  let resData = {}
   try {
     const { _id, title, desc, keywords, cover, content, user } = req.body
+    console.log('keywords', keywords)
 
-    await Blog.findOneAndUpdate({ _id }, { $set: { title, desc, keywords, cover, content } }, { upsert: false })
+    await Blog.findOneAndUpdate({ _id }, { $set: { title, desc, keywords, cover, content } }, { upsert: true })
 
     resData = MESSAGE.BLOG_UPDATED_SUCCESS
     res.json(resData)
@@ -275,6 +275,7 @@ router.post('/blog/update_bloginfo', async (req, res) => {
  *
  */
 router.post('/blog/delete_blog', async (req, res) => {
+  let resData = {}
   try {
     const { _id, currentPage, pageSize } = req.body
 
@@ -298,7 +299,8 @@ router.post('/blog/delete_blog', async (req, res) => {
  * 方法返回的数据格式为数组对象
  */
 
-router.get('/blog/count', async(req, res) => {
+router.get('/blog/count', async (req, res) => {
+  let resData = {}
   try {
     const populateObj = {
       path: 'category', // populate 字段
@@ -323,17 +325,12 @@ router.get('/blog/count', async(req, res) => {
         }
       }
     ])
-
     resData = countData
     resData.status = 200
     res.json(resData)
-
   } catch (error) {
     res.json(error)
   }
-  
-
-  
 })
 
 module.exports = router
