@@ -65,15 +65,21 @@ const blogField = {
 }
 
 // 获取博客列表数据
-const getBlogData = async (skip, pageSize, populateObj) => {
+const getBlogData = async (skip, pageSize, populateObj, userId) => {
   let resData = {}
   let totalCount = 0
   let pageData = []
 
   try {
-    totalCount = await Blog.countDocuments()
-
-    pageData = await Blog.find({}, blogField).populate(populateObj).skip(skip).limit(pageSize)
+    // 管理员userid=66827c2ada8fe31f4e8edc94
+    // 如果是管理员则查询出所有的blog 数据，如果是非管理员则只查询此用户发表的blog 数据
+    if (userId == '66827c2ada8fe31f4e8edc94') {
+      totalCount = await Blog.countDocuments()
+      pageData = await Blog.find({}, blogField).populate(populateObj).skip(skip).limit(pageSize)
+    } else {
+      totalCount = await Blog.find({ user: userId }).countDocuments()
+      pageData = await Blog.find({ user: userId }, blogField).populate(populateObj).skip(skip).limit(pageSize)
+    }
 
     resData.totalCount = totalCount
     resData.pageData = pageData
@@ -103,8 +109,9 @@ router.get('/blog/list', async (req, res) => {
   currentPage = req.query?.currentPage || 1
   pageSize = req?.query?.pageSize || 10
   skip = (currentPage && currentPage - 1) * pageSize
+  userId = req.query.userId
 
-  resData = await getBlogData(skip, pageSize, blogListPopulateObj)
+  resData = await getBlogData(skip, pageSize, blogListPopulateObj, userId)
   res.json(resData)
 })
 
