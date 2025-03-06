@@ -2,9 +2,16 @@ const express = require('express')
 const router = express()
 
 const Blog = require('../../model/Blog.js')
+const User = require('../../model/User.js')
 const { areAllEmpty } = require('../../../utils/index.js')
 
 const MESSAGE = require('../messageType.json')
+
+// 获取管理员Id，用于后面比对当前用户是否能获取所有blog 数据
+const getAdminId = async () => {
+  let adminId = await User.find({ username: 'admin' }).select('_id')
+  return adminId[0]._id
+}
 
 // 发表博客
 router.post('/blog/add', async (req, res) => {
@@ -70,10 +77,12 @@ const getBlogData = async (skip, pageSize, populateObj, userId) => {
   let totalCount = 0
   let pageData = []
 
+  const adminId = await getAdminId()
+
   try {
     // 管理员userid=66827c2ada8fe31f4e8edc94
     // 如果是管理员则查询出所有的blog 数据，如果是非管理员则只查询此用户发表的blog 数据
-    if (userId == '66827c2ada8fe31f4e8edc94') {
+    if (userId == adminId) {
       totalCount = await Blog.countDocuments()
       pageData = await Blog.find({}, blogField).populate(populateObj).skip(skip).limit(pageSize)
     } else {
