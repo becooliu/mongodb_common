@@ -5,16 +5,9 @@ const router = express.Router()
 
 const MESSAGE = require('../messageType.json')
 
+const { areAllEmpty } = require('../../../utils/index')
+
 let resData = {}
-/* router.use((req, res, next) => {
-  // console.log('req.userInfo', req?.userInfo)
-  if (req?.userInfo && !req.userInfo?.isAdmin) {
-    res.json(MESSAGE.PAGE_NOT_ALLOWED)
-    return
-  }
-  resData = null
-  next()
-}) */
 
 /**
  *
@@ -67,7 +60,6 @@ router.post('/user/login', async (req, res) => {
   try {
     const { username, password } = req.body
     let userData = await User.findOne({ username, password }).populate('role')
-    console.log('user: ', userData)
     if (!userData) {
       resData = MESSAGE.LOGIN_FAILD
     } else {
@@ -178,6 +170,43 @@ router.post('/user/delete_user', async (req, res) => {
       resData.status = 200
     }
     res.json(resData)
+  } catch (error) {
+    resData.message == error
+    res.json(resData)
+  }
+})
+
+/**
+ * 修改密码
+ */
+router.post('/user/change_password', async (req, res) => {
+  const resData = {}
+  try {
+    const { password, newpass, repass, userId, username } = req.body
+    const dataEmpty = areAllEmpty(password, newpass, repass)
+    if (Boolean(dataEmpty) == false) {
+      // 数据都不为空
+      if (newpass != repass) {
+        resData.message = '两次密码不一致！'
+        resData.status = 210
+      } else {
+        const userData = await User.findById({ _id: userId }).select('username password')
+
+        if (password !== userData.password || username !== userData.username) {
+          // 如果查询到的用户名、密码和用户传参中的用户名、密码不一致
+          resData.message = '用户名或密码错误，修改密码操作失败！'
+          resData.status = 205
+        } else {
+          await User.findByIdAndUpdate({ _id: userId }, { $set: { password: newpass } }, { upsert: false })
+          resData.message = '恭喜，修改密码成功'
+          resData.status = 200
+        }
+      }
+      res.json(resData)
+    } else {
+      resData = MESSAGE.DATA_CAN_NOT_BE_EMPTY
+      res.json(resData)
+    }
   } catch (error) {
     resData.message == error
     res.json(resData)
