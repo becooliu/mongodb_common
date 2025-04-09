@@ -29,6 +29,7 @@ router.get('/get24HoursApiVisited', async(req, res) => {
   try {
     let data = await apiVisited.find({visitTime : {$gte: before24Hours, $lte: now}})
     resData.status = 200
+    resData.apiRecord = data
     resData.count = data.length
     res.json(resData)
   } catch (error) {
