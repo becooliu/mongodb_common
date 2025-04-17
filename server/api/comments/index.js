@@ -16,6 +16,7 @@ router.post('/comments/add_comment', async (req, res) => {
       blogId,
       content: comment,
       author: userId,
+      createdAt: new Date().getTime(),
       replies: []
     })
     await newComment.save()
